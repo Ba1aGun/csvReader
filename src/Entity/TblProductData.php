@@ -12,11 +12,6 @@ class TblProductData
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
-     */
-    private $id;
-
-    /**
      * @ORM\Column(type="integer", nullable=true)
      */
     private $intProductDataId;
@@ -61,21 +56,9 @@ class TblProductData
      */
     private $decPrice;
 
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
-
     public function getIntProductDataId(): ?int
     {
         return $this->intProductDataId;
-    }
-
-    public function setIntProductDataId(?int $intProductDataId): self
-    {
-        $this->intProductDataId = $intProductDataId;
-
-        return $this;
     }
 
     public function getStrProductName(): ?string
