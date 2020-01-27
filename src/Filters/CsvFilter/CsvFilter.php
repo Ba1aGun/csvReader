@@ -21,7 +21,7 @@ class CsvFilter
         foreach ($this->filters as $filter){
             $response = $filter->execute($this->getData());
             $this->setData($response['data']);
-            $this->setErrors($response['errors']);
+            $this->setErrors($response['errors'] ?? []);
         }
         return $this;
     }

@@ -6,6 +6,7 @@ use App\Filters\CsvFilter\Interfaces\FilterInterface;
 class CostFilter implements FilterInterface
 {
     protected const ERROR_TEXT = 'Cost is not correct.';
+
     protected $callback;
 
     protected $errors;

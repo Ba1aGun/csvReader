@@ -29,7 +29,9 @@ class ImportFromCsvCommand extends Command
         $pathChecker = new PathChecker();
         if ($pathChecker->file($filePath, 'csv')) {
             $csvHandler = new CsvHandler();
-            $filteredData = $csvHandler->convertToArray($filePath)->filterData();
+            $filteredData = $csvHandler->convertToArray($filePath)->filterData()->getFilteredData();
+            $filteredData = $csvHandler->saveDataToDataBase($filteredData);
+
             $output->writeln('---------------------------------------------');
             foreach ($filteredData['errors'] as $error){
                 $output->writeln('in row: '. json_encode($error['row']['Product Code']) . ' error code :'. $error['message']);
