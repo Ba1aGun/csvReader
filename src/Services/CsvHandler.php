@@ -8,10 +8,8 @@ use App\Entity\TblProductData;
 use App\Filters\CsvFilter\CsvFilter;
 use App\Filters\CsvFilter\Filters\CostFilter;
 use App\Filters\CsvFilter\Filters\DiscontinuedFilter;
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
 use League\Csv\Reader;
-use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class CsvHandler
@@ -21,6 +19,16 @@ class CsvHandler
     protected $filteredData = [];
 
     protected $errors = [];
+
+    protected $entityManager;
+
+    protected $validator;
+
+    public function __construct(EntityManagerInterface $entityManager,  ValidatorInterface $validator)
+    {
+        $this->entityManager = $entityManager;
+        $this->validator = $validator;
+    }
 
     public function convertToArray(string $url): self
     {
@@ -59,26 +67,27 @@ class CsvHandler
 
     public function saveDataToDataBase($data): self
     {
-
-        $a = new Container();
-        $b = $a->get('doctrine');
-        $entityManager = $b->entityManager();
         foreach ($data as $row) {
+            $discontinuedDate = (!empty($row['discontinued_date']) && $row['discontinued_date'] == 1)
+                ? new \DateTime('now')
+                : null;
+
             $productData = new TblProductData();
             $productData->setStrProductCode($row['Product Code']);
             $productData->setStrProductName($row['Product Name']);
             $productData->setStrProductDesc($row['Product Description']);
-            $productData->setIntStockLevel($row['Stock']);
+            $productData->setIntStockLevel((int)$row['Stock']);
             $productData->setDecPrice($row['Cost in GBP']);
-            $productData->setDtmDiscontinued($row['discontinued_date'] ?? null);
+            $productData->setDtmAdded(new \DateTime('now'));
+            $productData->setDtmDiscontinued($discontinuedDate);
 
-            $errors = $validator->validate($productData);
+            $errors = $this->validator->validate($productData);
             if (count($errors) > 0) {
                 $this->setErrors(['message' => 'cant save' . $row['Product Code']]);
             } else {
-                $entityManager->persist($productData);
+                $this->entityManager->persist($productData);
 
-                $entityManager->flush();
+                $this->entityManager->flush();
             }
         }
         return $this;
@@ -91,7 +100,12 @@ class CsvHandler
 
     public function getFilteredData(): array
     {
-        return ['data' => $this->filteredData, 'errors' => $this->errors];
+        return $this->filteredData;
+    }
+
+    public function getErrors(): array
+    {
+        return $this->errors;
     }
 
     public function setErrors($errors): self

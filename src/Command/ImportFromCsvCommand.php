@@ -17,6 +17,17 @@ class ImportFromCsvCommand extends Command
 {
     protected static $defaultName = 'csv';
 
+    protected $csvHandler;
+
+    protected $pathChecker;
+
+    public function __construct(CsvHandler $csvHandler, PathChecker $pathChecker, string $name = null)
+    {
+        $this->csvHandler = $csvHandler;
+        $this->pathChecker = $pathChecker;
+        parent::__construct($name);
+    }
+
     protected function configure()
     {
         $this->setDescription('Import data from csv file to database')
@@ -25,15 +36,11 @@ class ImportFromCsvCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $filePath = $input->getArgument('file_path');
-        $pathChecker = new PathChecker();
-        if ($pathChecker->file($filePath, 'csv')) {
-            $csvHandler = new CsvHandler();
-            $filteredData = $csvHandler->convertToArray($filePath)->filterData()->getFilteredData();
-            $filteredData = $csvHandler->saveDataToDataBase($filteredData);
+        if ($this->pathChecker->file($input->getArgument('file_path'), 'csv')) {
+            $this->csvHandler->convertToArray($input->getArgument('file_path'))->filterData()->saveDataToDataBase($this->csvHandler->getFilteredData());
 
             $output->writeln('---------------------------------------------');
-            foreach ($filteredData['errors'] as $error){
+            foreach ($this->csvHandler->getErrors() as $error){
                 $output->writeln('in row: '. json_encode($error['row']['Product Code']) . ' error code :'. $error['message']);
             }
             return 0;
