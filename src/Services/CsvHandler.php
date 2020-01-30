@@ -98,6 +98,12 @@ class CsvHandler
         return $this->csvData;
     }
 
+    public function setCsvData($csvData): self
+    {
+        $this->csvData = $csvData;
+        return $this;
+    }
+
     public function getFilteredData(): array
     {
         return $this->filteredData;

@@ -19,3 +19,7 @@
 composer.lock
 stock.csv
 text.csv
+###> phpunit/phpunit ###
+/phpunit.xml
+.phpunit.result.cache
+###< phpunit/phpunit ###

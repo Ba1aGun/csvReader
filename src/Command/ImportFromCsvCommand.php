@@ -39,7 +39,8 @@ class ImportFromCsvCommand extends Command
         if ($this->pathChecker->file($input->getArgument('file_path'), 'csv')) {
             $this->csvHandler->convertToArray($input->getArgument('file_path'))->filterData()->saveDataToDataBase($this->csvHandler->getFilteredData());
 
-            $output->writeln('---------------------------------------------');
+            $output->writeln('number of successful entries: '.count($this->csvHandler->getFilteredData()));
+            $output->writeln('Errors: ');
             foreach ($this->csvHandler->getErrors() as $error){
                 $output->writeln('in row: '. json_encode($error['row']['Product Code']) . ' error code :'. $error['message']);
             }
