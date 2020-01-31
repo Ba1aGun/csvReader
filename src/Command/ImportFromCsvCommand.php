@@ -37,7 +37,10 @@ class ImportFromCsvCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         if ($this->pathChecker->file($input->getArgument('file_path'), 'csv')) {
-            $this->csvHandler->convertToArray($input->getArgument('file_path'))->filterData()->saveDataToDataBase($this->csvHandler->getFilteredData());
+            $this->csvHandler->convertToArray($input->getArgument('file_path'));
+            $output->writeln('number of rows: '.count($this->csvHandler->getCsvData()));
+
+            $this->csvHandler->filterData()->saveDataToDataBase($this->csvHandler->getFilteredData());
 
             $output->writeln('number of successful entries: '.count($this->csvHandler->getFilteredData()));
             $output->writeln('Errors: ');

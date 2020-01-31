@@ -4,10 +4,10 @@ namespace App\tests;
 
 use App\Services\CsvHandler;
 use League\Csv\Reader;
-use \PHPUnit\Framework\TestCase;
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 
-class csvHandlerTest extends TestCase
+class CsvHandlerTest extends WebTestCase
 {
     protected $csvPath = 'stock.csv';
 
@@ -16,14 +16,11 @@ class csvHandlerTest extends TestCase
         return Reader::createFromPath($this->csvPath);
     }
 
-    public function testConvertToArray(CsvHandler $csvHandler)
+    public function testConvertToArray()
     {
+        self::bootKernel();
+        $csvHandler = self::$kernel->getContainer()->get(CsvHandler::class);
         $this->assertTrue(is_array($csvHandler->convertToArray($this->csvPath)->getCsvData()));
         return $csvHandler;
     }
-
-    public function testFilters($csvArray)
-    {
-    }
-
 }
